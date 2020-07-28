@@ -158,6 +158,8 @@ class NilaiController extends Controller
                         ->join('tb_ruangan AS h','h.id','=','x.id_ruangan','left')->orderBy('id_waktusidang','desc')
                         ->where('y.nim',$nim)
                         ->get();
+        $dosen = array();
+        $dosenp = array();
         foreach ($mhs as $data ) {
             $dosen[0] = $data->dosenp1;
             $dosen[1] = $data->dosenp2;

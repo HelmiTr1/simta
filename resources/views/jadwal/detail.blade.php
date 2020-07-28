@@ -7,6 +7,8 @@
 {{ Breadcrumbs::render('jadwal') }}
 @endsection
 @section('content')
+@if (count($jadwal)>0)
+
 <div class="row">
     <div class="col-xl-9">
       <div class="card">
@@ -104,6 +106,17 @@
     </div>
 </div>
 </div>
+@else
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body text-center">
+      Jadwal belum di<i>generate</i>. Silahkan hubungi admin.
+      </div>
+    </div>
+  </div>
+</div>
+@endif
 @endsection
 @section('link')
 <link href='{{url('assets/fullcalendar/core/main.css')}}' rel='stylesheet' />
