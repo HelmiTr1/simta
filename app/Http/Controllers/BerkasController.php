@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Bimbingan;
 use App\Content;
+use App\Jadwal;
 use App\Menu;
 use App\Revisi;
 use Illuminate\Support\Facades\File; 
@@ -39,8 +41,15 @@ class BerkasController extends Controller
             $id = $i->id;
         }
         $content = Content::get()->where('row_status','1')->where('id_level',Auth::user()->level_id)->where('id_menu',$id);
+
+        $bimbingan =  Bimbingan::all()->where('nim',Auth::user()->username);
+        // var_dump($bimbingan);die;
+        foreach ($bimbingan as $data) {
+            $id_bimbingan = $data->id;
+        }
+        $jadwal = Jadwal::get()->where('row_status','1')->where('id_bimbingan',$id_bimbingan);
         $revisi = Revisi::get()->where('nim',Auth::user()->username)->where('status','1')->where('row_status','1')->sortByDesc('input_at');
-        return view('berkas.index',compact('menus','content','revisi'));
+        return view('berkas.index',compact('menus','content','revisi','jadwal'));
     }
     public function show(Revisi $berkas)
     {

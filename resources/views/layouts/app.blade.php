@@ -327,10 +327,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             @php
               $id=Auth::user()->username;
             if (Auth::user()->level_id=='3') {
-              $nama = \App\Mahasiswa::get()->where('nim',$id);
+              $nama = DB::table('tb_mahasiswa')->get()->where('nim',$id);
               
             }else{
-              $nama = \App\Dosen::get()->where('nidn',$id);
+              $nama = DB::table('tb_mahasiswa')->get()->where('nidn',$id);
             }
 
             if ($id=Auth::user()->level_id=='1') {
@@ -342,6 +342,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               $nama = explode(" ",$nama);
               $nama = $nama[0];
             }
+            // echo $nama;
             @endphp
             <li class="nav-item dropdown">
               <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -350,7 +351,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                     <img alt="Image placeholder" src="{{url('assets/img/faces/team-4.jpg')}}">
                   </span>
                   <div class="media-body  ml-2  d-none d-lg-block">
-                    <span class="mb-0 text-sm  font-weight-bold">{{$nama}}</span>
+                    <span class="mb-0 text-sm  font-weight-bold">{{Str::upper($nama)}}</span>
                   </div>
                 </div>
               </a>

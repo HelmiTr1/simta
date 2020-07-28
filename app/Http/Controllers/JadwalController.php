@@ -34,7 +34,14 @@ class JadwalController extends Controller
      */
     public function index()
     {
-        $menus = Menu::get()->where('row_status','1');
+        $access= DB::table('tb_menuaccess')->get()->where('id_level',Auth::user()->level_id);
+        $izin = array();
+        $i=0;
+        foreach ($access as $data ) {
+            $izin[$i] = $data->id_menu;
+            $i++;
+        }
+        $menus = Menu::all()->where('row_status','1')->whereIn('id',$izin);
         return view('jadwal.index',compact('menus'));
     }
 
@@ -73,23 +80,22 @@ class JadwalController extends Controller
         $tglStart = $request->start;
         $tglEnd = $request->end;
         $tglMulai = $request->mulai;
-        
-        for ($i=0; $i < 45; $i++) {
+        $x=0;
+        for ($i=0; $i < 45; $i=$i+4) {
             if($i==0){
                 $stamp=strtotime($tglMulai);
 
             }else{
-                $stamp=strtotime('+'.$i.' days', strtotime($tglMulai));
+                $stamp=strtotime('+'.$x.' days', strtotime($tglMulai));
             }
 
             $date[$i] = date('Y-m-d', $stamp);
             $date[$i+1] = date('Y-m-d', $stamp);
             $date[$i+2] = date('Y-m-d', $stamp);
             $date[$i+3] = date('Y-m-d', $stamp);
-            $date[$i+4] = date('Y-m-d', $stamp);
-
+            $x=$x+1;
         }
-        
+        // var_dump($date);die;
         $data =[
             'generasi' => $generasi,
             'batch' => $batch,

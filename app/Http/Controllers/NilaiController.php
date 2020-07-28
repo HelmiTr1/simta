@@ -277,7 +277,7 @@ class NilaiController extends Controller
         // return $mhs;
         $aspekNilai = Aspeknilai::get()->where('row_status','1')->where('kategori','sidang');
         $aspekNilai2 = Aspeknilai::get()->where('row_status','1')->where('kategori','proses');
-        $menus = Menu::get()->where('row_status','1');
+        // $menus = Menu::get()->where('row_status','1');
         $mhs2 = DB::table('tb_mahasiswa')->where('row_status','1')->get();
         return view('nilai.index2',compact('menus','mhs','mhs2','dosen','dosenp','aspekNilai','aspekNilai2','nim'));
         // return $mhs;

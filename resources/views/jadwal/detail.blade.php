@@ -3,7 +3,9 @@
 @section('title')
     Jadwal Sidang
 @endsection
-
+@section('bread')
+{{ Breadcrumbs::render('jadwal') }}
+@endsection
 @section('content')
 <div class="row">
     <div class="col-xl-9">

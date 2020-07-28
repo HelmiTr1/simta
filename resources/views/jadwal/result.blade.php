@@ -29,7 +29,7 @@
             <thead class="thead-light">
               <tr>
                 <th scope="col">Action</th>
-                {{-- <th scope="col">Tanggal</th> --}}
+                <th scope="col">Tanggal</th>
                 <th scope="col">Hari</th>
                 <th scope="col">Jam</th>
                 <th scope="col">Ruangan</th>
@@ -47,11 +47,11 @@
                     <td>
                     <a href="" class="btn btn-warning btn-sm edit" data-toggle="modal" data-target="#myModal" data-id="{{$j->id}}" data-dosen1={{$j->dosen1}} data-dosen2={{$j->dosen2}}><span data-toggle="tooltip" data-placement="top" data-title="Edit Penguji"><i class="fas fa-fw fa-edit"></i></span></a>
                     </td>
-                    {{-- <?php
+                    <?php
                       Date::setLocale('id');
                       $date = new Date($j->tanggal);
                       ?>
-                  <td>{{$date->format('j F Y')}}</td> --}}
+                  <td>{{$date->format('j F Y')}}</td>
                   <td>{{$j->hari}}</td>
                   <td class="text-center">{{$j->waktu}}</td>
                   <td>{{$j->kode_ruangan.' - '.$j->ruangan}}</td>
@@ -130,7 +130,7 @@
     <script>
         $(document).ready(function(){
           var table = $('table').DataTable({
-            "order": [[ 1, "desc" ],[ 2, "asc" ]],
+            "order": [[ 2, "desc" ],[ 3, "asc" ]],
             "language": {
             "paginate": {
               "previous": "<i class='fas fa-angle-left'></i>",
@@ -160,26 +160,7 @@
             $('#myModal form').attr('action', url);
             $('#myModal form select[name="dospen1"]').val(dosen1).change();
             $('#myModal form select[name="dospen2"]').val(dosen2).change();
-            // $('#editCategoryModal form input[name="max_score"]').val(maxScore);
           })
-
-          // $('.edit').on('click', function(e) {
-          //   e.preventDefault();
-          // var id = $(this).data('id');
-          // var dosen1 = $(this).data('dosen1');
-          // var dosen2 = $(this).data('dosen2');
-          //   console.log(dosen1);
-          // // console.log(d);
-          // // var name = $(this).data('name');
-          // // var parentId = $(this).data('parent-id');
-          // // var maxScore = $(this).data('max-score');
-          // var url = "{{ url('sidang/jadwal') }}/" + id;
-
-          // $('#myModal form').attr('action', url);
-          // $('#myModal form select[name="dospen1"]').val(dosen1).change();
-          // $('#myModal form select[name="dospen2"]').val(dosen2).change();
-          // // $('#editCategoryModal form input[name="max_score"]').val(maxScore);
-          // });
         });
         </script>
 @endsection

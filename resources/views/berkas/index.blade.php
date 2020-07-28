@@ -7,6 +7,7 @@
 {{ Breadcrumbs::render('berkas') }}
 @endsection
 @section('content')
+@if (count($jadwal)>0)
 @if (Auth::user()->level_id =='1')
     
 <div class="row">
@@ -38,6 +39,28 @@
 </div>
 @elseif( Auth::user()->level_id =='3')
 @foreach ($content as $c)
+@if (count($revisi)==0)
+@php
+  foreach ($jadwal as $data ) {
+    $date = $data->tanggal;
+  }
+  Date::setLocale('id');
+  $stamp = strtotime('+7 days', strtotime($date));
+  $batas = new Date($stamp);
+  $now = date('Y-m-d');
+@endphp
+<div class="row">
+  <div class="col-xl-12">
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span class="alert-icon"><i class="ni ni-lock-circle-open"></i></span>
+  <span class="alert-text"><strong>Perhatian!</strong> Batas akhir pengiriman berkas hasil revisi adalah : <span class="font-weight-bold">{{$batas->format('l, j F Y')}}</span> </span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+  </div>
+</div>
+@endif
   <div class="row">
     <div class="col-xl-12">
           <div class="card card-stats">
@@ -62,19 +85,30 @@
               </div>
               @endif
               @if (count($revisi)==0)
-              <div class="my-3">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="revisi" name="revisi" lang="en" accept="application/pdf">
-                        <label class="custom-file-label" for="customFileLang">Select file</label>
-                        <div class="invalid-feedback mt-0" id="invalid"></div>
-                        <div class="invalid-feedback mt-0" id="invalid2"></div>
-                        <div id="uploading"></div>
-                    </div>
-              </div>
+              @if ($batas==$now)
+                <div class="row mt-4">
+                  <div class="col-xl-12">
+                  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span class="alert-icon"><i class="ni ni-fat-remove"></i></span>
+                  <span class="alert-text"><strong>Perhatian!</strong> Pengiriman berkas revisi telah mencapai batas waktu, Silahkan Hubungi admin untuk perpanjangan Waktu </span>
+                </div>
+                  </div>
+                </div>
+                @else
+                <div class="my-3">
+                      <div class="custom-file">
+                          <input type="file" class="custom-file-input" id="revisi" name="revisi" lang="en" accept="application/pdf">
+                          <label class="custom-file-label" for="customFileLang">Select file</label>
+                          <div class="invalid-feedback mt-0" id="invalid"></div>
+                          <div class="invalid-feedback mt-0" id="invalid2"></div>
+                          <div id="uploading"></div>
+                      </div>
+                </div>
+                @endif
               @else
               @foreach($revisi as $r)
               <div class="row">
-
+  
               <div class=" col-xl-6 text-left">  <a href="{{url('berkas').'/'.$r->id}}"  target="_blank" >{{$r->filename}}</a></div>
               <div class=" col-xl-6 text-right"> <form action="{{url('berkas').'/'.$r->id}}" method="post" class="d-inline" id="hapus-btn{{$r->id}}">
                     @method('delete')
@@ -90,12 +124,22 @@
           </div>
         </a>
       </div>
-    </div>
+  </div>
         @endforeach
+@endif
+@else
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body text-center">
+      Jadwal belum di<i>generate</i>. Silahkan hubungi admin.
+      </div>
+    </div>
+  </div>
+</div>
 @endif
 @endsection
 @if( Auth::user()->level_id =='3')
-
 @section('footer')
 <script>
   function confirmDelete(id) {
