@@ -44,6 +44,7 @@ Route::resource('sidang/waktu','WaktuController')->except('show','create','destr
 Route::resource('sidang/waktusidang','WaktusidangController')->except('show','create','destroy','store','edit');
 Route::get('sidang/jadwal/result','JadwalController@result');
 Route::get('sidang/jadwal/detail','JadwalController@detail');
+Route::get('sidang/jadwal/clear','JadwalController@clear');
 Route::resource('sidang/jadwal','JadwalController');
 Route::resource('sidang/ruangan','RuanganController')->except('show');
 Route::get('sidang/nilai/rekap', 'NilaiController@rekap')->name('nilai.rekap');

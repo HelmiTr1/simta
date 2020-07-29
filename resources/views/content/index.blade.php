@@ -112,16 +112,7 @@
               "first": "<i class='fas fa-angle-double-left'></i>",
               "last": "<i class='fas fa-angle-double-right'></i>"
                 }
-          },
-            buttons: [
-            'copy', 'excel', 'pdf'
-          ],
-          responsive: true,
-        columnDefs: [
-            { responsivePriority: 1, targets: 2 },
-            { responsivePriority: 1, targets: 4 },
-            { responsivePriority: 2, targets: -1 }
-        ]
+          }
           });
           });
         </script>

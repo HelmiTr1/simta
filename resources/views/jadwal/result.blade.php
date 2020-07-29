@@ -15,6 +15,10 @@
             <div class="col">
               <h3 class="mb-0">Daftar Jadwal</h3>
             </div>
+            <div class="col text-right">
+            <a href="{{url('sidang/jadwal/clear')}}" class="btn btn-sm btn-danger" id="btn-clear"><i class="fas fa-fw fa-trash"></i> Clear Jadwal</a>
+            </div>
+            
           </div>
           @if (session('status'))
           <div class="alert alert-success">
@@ -46,6 +50,11 @@
                   <tr>
                     <td>
                     <a href="" class="btn btn-warning btn-sm edit" data-toggle="modal" data-target="#myModal" data-id="{{$j->id}}" data-dosen1={{$j->dosen1}} data-dosen2={{$j->dosen2}}><span data-toggle="tooltip" data-placement="top" data-title="Edit Penguji"><i class="fas fa-fw fa-edit"></i></span></a>
+                    <form action="{{url('sidang/jadwal').'/'.$j->id}}" method="post" class="d-inline" id="hapus-btn{{$j->id}}">
+                      @method('delete')
+                      @csrf
+                    </form>
+                    <button type="submit" class="btn btn-sm btn-danger" onclick='confirmDelete({{$j->id}})'><i class="fas fa-fw fa-trash"></i></button>
                     </td>
                     <?php
                       Date::setLocale('id');
@@ -117,7 +126,30 @@
 @endsection
 
 @section('footer')
-
+<script>
+  function confirmDelete(id) {
+            Swal.fire({
+                 title: 'Apakah Anda Yakin?',
+                  text: "Anda Tidak Akan Dapat Mengembalikannya!",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Yes, delete it!'
+            })
+                .then((willDelete) => {
+                    if (willDelete.value) {
+                        $('#hapus-btn'+id).submit();
+                    } else {
+                      Swal.fire({
+                        icon: 'error',
+                        title: 'Cancelled',
+                        text: 'Data tidak dihapus!'
+                      })
+                    }
+                });
+        }
+</script>
 <link rel="stylesheet" href="{{url('assets/vendor/datatables.net-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{url('assets/vendor/datatables.net-buttons-bs4/css/buttons.dataTables.min.css')}}">
 <link rel="stylesheet" href="{{url('assets/vendor/datatables.net-responsive-bs4/css/responsive.dataTables.min.css')}}">
@@ -130,7 +162,7 @@
     <script>
         $(document).ready(function(){
           var table = $('table').DataTable({
-            "order": [[ 2, "desc" ],[ 3, "asc" ]],
+            "order": [[ 10, "asc" ],[ 2, "desc" ],[ 3, "asc" ]],
             "language": {
             "paginate": {
               "previous": "<i class='fas fa-angle-left'></i>",
@@ -161,6 +193,33 @@
             $('#myModal form select[name="dospen1"]').val(dosen1).change();
             $('#myModal form select[name="dospen2"]').val(dosen2).change();
           })
+
+          $(document).on("click","#btn-clear",function(e) {
+            e.preventDefault();
+            var href = $(this).attr('href');
+            Swal.fire({
+            title: 'Apakah anda yakin?',
+            text: "Anda menghapus seluruh jadwal yang telah digenerate",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Hapus'
+          }).then((result) => {
+            if (result.value) {
+              document.location.href = href;
+            }else{
+              Swal.fire({
+                icon: 'info',
+                title: 'Perhatian!',
+                text: 'Seluruh data jadwal tidak dihapus',
+              })
+            }
+          });
+          });
         });
+        </script>
+        <script>
+          
         </script>
 @endsection

@@ -104,18 +104,29 @@ class JadwalController extends Controller
             'mutasi' => $mutasi
         ];
         $mhs_cek = Bimbingan::get()->where('row_status','1');
+        $mhs_id=array();
+        $i=0;
         foreach ($mhs_cek as $data ) {
-            $jadwal_cek = Jadwal::get()->where('row_status','1')->where('id_bimbingan',$data->id);
+            $mhs_id[$i] = $data->id;
+            $i++;
         }
+        
+        $jadwal_cek= Jadwal::get()->where('row_status','1')->whereIn('id_bimbingan',$mhs_id);
+
         $jad_cek = count($jadwal_cek);
-        // // return $jadwal_cek != null ? true : '0';
-        if ($jad_cek == 0) {
+        $mh_cek = count($mhs_cek);
+
+        if ($jad_cek != $mh_cek ) {
             $algorithm = new AlgorithmController($batch,$populasi,$crossover,$mutasi);
     
-            $algorithm->GetData();
-            // return $dd;
-            $algorithm->inisialisasi();
             $cek = Jadwal::get()->where('row_status','1')->where('batch', $batch)->first();
+            if ($cek) {
+                // return true;
+                Jadwal::where('batch',$batch)->delete();
+            }
+            $algorithm->GetData();
+            
+            $algorithm->inisialisasi();
     
             $found = false;
             for($i = 0;$i < $generasi;$i++ ){
@@ -128,10 +139,7 @@ class JadwalController extends Controller
                     
                     if($fitnessAfterMutation[$j] == 1){
                 //         // $index += $j;
-                        if ($cek) {
-                            // return true;
-                            Jadwal::where('batch',$batch)->delete();
-                        }
+                        
                         $jadwal= array(array());
                         $jadwal = $algorithm->GetIndividu($j);
                         for ($k=0; $k < count($jadwal); $k++) {
@@ -164,15 +172,16 @@ class JadwalController extends Controller
             return redirect('sidang/jadwal/result');
             // return $fitness;
         }else{
-            Alert::success('Warning!',"Mahasiswa yang dipilih sudah memiliki jadwal!")->persistent('Close');
+            Alert::warning('Warning!',"Mahasiswa yang dipilih sudah memiliki jadwal!")->persistent('Close');
             return redirect('sidang/jadwal/result');
 
         }
         
 
     }
-    public function result()
+    public function result(Request $request)
     {
+        
         $jadwal = DB::table('tb_jadwalsidang AS x')
                     ->select('x.tanggal','x.id','a.nama as mhs','b.nama as dospem1', 'c.nama AS dospem2', 
                             'd.nidn as dosen1','d.nama AS dospen1','e.nidn as dosen2', 'e.nama As dospen2','f.hari as hari',
@@ -253,7 +262,13 @@ class JadwalController extends Controller
      */
     public function destroy(Jadwal $jadwal)
     {
-        //
+        if (Auth::user()->level_id !=1) {
+            abort(403);
+        }
+        Jadwal::where('id', $jadwal->id)
+          ->delete();
+              Alert::success('Berhasil!',"Data jadwal berhasil dihapus!")->persistent('Close');
+        return redirect('sidang/jadwal/result');
     }
 
     public function detail(Request $request)
@@ -303,5 +318,16 @@ class JadwalController extends Controller
         }
         $menus = Menu::all()->where('row_status','1')->whereIn('id',$izin);
         return view('jadwal.detail',compact('menus','jadwal','jadwal2','s','dosen'));
+    }
+
+    public function clear()
+    {
+        if (Auth::user()->level_id !=1) {
+            abort(403);
+        }
+        DB::table('tb_jadwalsidang')->truncate();
+
+        Alert::success('berhasil!',"Data jadwal berhasil dihapus! Silahkan lakukan generate jadwal kembali!")->persistent('Close');
+        return redirect('sidang/jadwal/result');
     }
 }

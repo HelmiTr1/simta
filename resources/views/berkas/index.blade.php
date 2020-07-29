@@ -6,10 +6,9 @@
 @section('bread')
 {{ Breadcrumbs::render('berkas') }}
 @endsection
-@section('content')
-@if (count($jadwal)>0)
+
 @if (Auth::user()->level_id =='1')
-    
+@section('content')
 <div class="row">
 @foreach ($content as $c)
 <div class="col-xl-4 col-md-6">
@@ -37,8 +36,10 @@
   </div>
 @endforeach
 </div>
+@endsection
 @elseif( Auth::user()->level_id =='3')
-@foreach ($content as $c)
+@if (count($jadwal)>0)
+@section('card')
 @if (count($revisi)==0)
 @php
   foreach ($jadwal as $data ) {
@@ -49,7 +50,6 @@
   $batas = new Date($stamp);
   $now = date('Y-m-d');
 @endphp
-<div class="row">
   <div class="col-xl-12">
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <span class="alert-icon"><i class="ni ni-lock-circle-open"></i></span>
@@ -59,8 +59,10 @@
     </button>
 </div>
   </div>
-</div>
 @endif
+@endsection
+@section('content')
+@foreach ($content as $c)
   <div class="row">
     <div class="col-xl-12">
           <div class="card card-stats">
@@ -126,19 +128,20 @@
       </div>
   </div>
         @endforeach
-@endif
-@else
-<div class="row">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-body text-center">
-      Jadwal belum di<i>generate</i>. Silahkan hubungi admin.
+    @else
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center">
+        Jadwal belum di<i>generate</i>. Silahkan hubungi admin.
+        </div>
       </div>
     </div>
   </div>
-</div>
-@endif
+  @endif
 @endsection
+@endif
+
 @if( Auth::user()->level_id =='3')
 @section('footer')
 <script>

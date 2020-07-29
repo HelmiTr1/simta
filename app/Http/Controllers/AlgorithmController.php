@@ -8,6 +8,7 @@ use App\Jadwal;
 use App\Ruangan;
 use App\Waktusidang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AlgorithmController extends Controller
 {
@@ -38,36 +39,41 @@ class AlgorithmController extends Controller
     {
         $data_jadwal = Jadwal::get()->where('row_status','1');
         $jad_count = count($data_jadwal);
+
+        // return $data_jadwal;
         if ($jad_count != 0) {
+            $id=array();
+            $i=0;
             foreach ($data_jadwal as $data) {
-                $data_mhs = Bimbingan::get()->where('row_status','1')->where('id','!=',$data->id_bimbingan);
-        
-                $i=0;
-        
-                foreach ($data_mhs as $data) {
-                    $this->mhs[$i] = $data->id;
-                    $this->dospem[$i] = $data->dospem1;
-                    $this->dospem2[$i] = $data->dospem2;
-                    $data_dosen = Dosen::get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i]);
-                    $j=0;
-                    foreach ($data_dosen as $data ) {
-                        $this->dospen[$j] = $data->nidn;
-                        // $i++;
-                        $data_dosen2 = Dosen::get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i])->where('nidn','!=',$this->dospen[$j]);
-                        $k=0;
-                        foreach ($data_dosen2 as $data ) {
-                            $this->dospen2[$k] = $data->nidn;
-                            $k++;
-                        }
-                        $j++;
-        
-                    }
-                    $i++;
-                }
+                $id[$i] = $data->id_bimbingan;
+                $i++;
+            }
+            $data_mhs = DB::table('tb_bimbingan')->get()->where('row_status','1')->whereNotIn('id',$id)->sortBy('RAND()');
     
+            $i=0;
+    
+            foreach ($data_mhs as $data) {
+                $this->mhs[$i] = $data->id;
+                $this->dospem[$i] = $data->dospem1;
+                $this->dospem2[$i] = $data->dospem2;
+                $data_dosen = DB::table('tb_dosen')->get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i])->sortBy('RAND()');
+                $j=0;
+                foreach ($data_dosen as $data ) {
+                    $this->dospen[$j] = $data->nidn;
+                    // $i++;
+                    $data_dosen2 = DB::table('tb_dosen')->get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i])->where('nidn','!=',$this->dospen[$j])->sortBy('RAND()');
+                    $k=0;
+                    foreach ($data_dosen2 as $data ) {
+                        $this->dospen2[$k] = $data->nidn;
+                        $k++;
+                    }
+                    $j++;
+    
+                }
+                $i++;
             }
         }else{
-            $data_mhs = Bimbingan::get()->where('row_status','1');
+            $data_mhs = DB::table('tb_bimbingan')->get()->where('row_status','1')->sortBy('RAND()');
         
             $i=0;
     
@@ -75,12 +81,12 @@ class AlgorithmController extends Controller
                 $this->mhs[$i] = $data->id;
                 $this->dospem[$i] = $data->dospem1;
                 $this->dospem2[$i] = $data->dospem2;
-                $data_dosen = Dosen::get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i]);
+                $data_dosen = DB::table('tb_dosen')->get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i])->sortBy('RAND()');
                 $j=0;
                 foreach ($data_dosen as $data ) {
                     $this->dospen[$j] = $data->nidn;
                     // $i++;
-                    $data_dosen2 = Dosen::get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i])->where('nidn','!=',$this->dospen[$j]);
+                    $data_dosen2 = DB::table('tb_dosen')->get()->where('row_status','1')->where('nidn','!=',$this->dospem[$i])->where('nidn','!=',$this->dospem2[$i])->where('nidn','!=',$this->dospen[$j])->sortBy('RAND()');
                     $k=0;
                     foreach ($data_dosen2 as $data ) {
                         $this->dospen2[$k] = $data->nidn;
@@ -111,13 +117,18 @@ class AlgorithmController extends Controller
     public function inisialisasi()
     {
         $jam_count = count($this->jamsidang);
-        $jam_count = count($this->jamsidang);
+        $mhs_count = count($this->mhs);
+        if($mhs_count>$jam_count){
+            $init = $jam_count;
+        }else{
+            $init = $mhs_count;
+        }
         $dospen1_count = count($this->dospen);
         $dospen2_count = count($this->dospen2);
         $ruangan_count = count($this->ruangan);
 
         for ($i=0; $i < $this->populasi; $i++) { 
-            for ($j=0; $j < $jam_count; $j++) { 
+            for ($j=0; $j < $init; $j++) { 
                 $this->individu[$i][$j][0] = $j;
                 
                 // $this->individu[$i][$j][1] = mt_rand(0,($jam_count-1));
@@ -133,13 +144,19 @@ class AlgorithmController extends Controller
     {
         $pinalty = 0;
         $jam_count = count($this->jamsidang);
+        $mhs_count = count($this->mhs);
+        if($mhs_count>$jam_count){
+            $init = $jam_count;
+        }else{
+            $init = $mhs_count;
+        }
 
-        for ($i=0; $i < $jam_count; $i++) { 
+        for ($i=0; $i < $init; $i++) { 
             // $jam_1 = intval($this->individu[$ind][$i][1]);
             $dospen1_1 = intval($this->individu[$ind][$i][1]);
             $dospen2_1 = intval($this->individu[$ind][$i][2]);
             $ruangan_1 = intval($this->individu[$ind][$i][3]);
-            for ($j = 0; $j < $jam_count; $j++) { 
+            for ($j = 0; $j < $init; $j++) { 
                 // $jam_2 = intval($this->individu[$ind][$j][1]);
                 $dospen1_2 = intval($this->individu[$ind][$j][1]);
                 $dospen2_2 = intval($this->individu[$ind][$j][2]);
@@ -216,6 +233,12 @@ class AlgorithmController extends Controller
     {
         $individu_baru = array(array(array()));
         $jam_count = count($this->jamsidang);
+        $mhs_count = count($this->mhs);
+        if($mhs_count>$jam_count){
+            $init = $jam_count;
+        }else{
+            $init = $mhs_count;
+        }
 
         for ($i = 0; $i < $this->populasi; $i += 2)
         {
@@ -224,9 +247,9 @@ class AlgorithmController extends Controller
             $cr = mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax();
 
             if (floatval($cr) < floatval($this->crossover)) {
-                $a = mt_rand(0, $jam_count - 2);
+                $a = mt_rand(0, $init - 2);
                 while ($b <= $a) {
-                    $b = mt_rand(0, $jam_count - 1);
+                    $b = mt_rand(0, $init - 1);
                 }
                 for ($j = 0; $j < $a; $j++) {
                     for ($k = 0; $k < 4; $k++) {                        
@@ -238,13 +261,13 @@ class AlgorithmController extends Controller
                         $individu_baru[$i][$j][$k]     = $this->individu[$this->induk[$i]][$j][$k];
                     }
                 }
-                for ($j = $b; $j < $jam_count; $j++) {
+                for ($j = $b; $j < $init; $j++) {
                     for ($k = 0; $k < 4; $k++) {
                         $individu_baru[$i][$j][$k]     = $this->individu[$this->induk[$i]][$j][$k];
                     }
                 }
             }else{
-                for ($j = 0; $j < $jam_count; $j++) {
+                for ($j = 0; $j < $init; $j++) {
                     for ($k = 0; $k < 4; $k++) {
                         $individu_baru[$i][$j][$k]     = $this->individu[$this->induk[$i]][$j][$k];
                     }
@@ -252,9 +275,15 @@ class AlgorithmController extends Controller
             }
         }
         $jam_count = count($this->jamsidang);
+        $mhs_count = count($this->mhs);
+        if($mhs_count>$jam_count){
+            $init = $jam_count;
+        }else{
+            $init = $mhs_count;
+        }
         
         for ($i = 0; $i < $this->populasi; $i += 2) {
-          for ($j = 0; $j < $jam_count ; $j++) {
+          for ($j = 0; $j < $init ; $j++) {
             for ($k = 0; $k < 4; $k++) {
                 $this->individu[$i][$j][$k] = $individu_baru[$i][$j][$k];
                 // $this->individu[$i + 1][$j][$k] = $individu_baru[$i + 1][$j][$k];
@@ -271,6 +300,12 @@ class AlgorithmController extends Controller
         $r       = mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax();
 
         $jam_count = count($this->jamsidang);
+        $mhs_count = count($this->mhs);
+        if($mhs_count>$jam_count){
+            $init = $jam_count;
+        }else{
+            $init = $mhs_count;
+        }
         // $jam_count = count($this->jamsidang);
         $dospen1_count = count($this->dospen);
         $dospen2_count = count($this->dospen2);
@@ -278,7 +313,7 @@ class AlgorithmController extends Controller
 
         for ($i = 0; $i < $this->populasi; $i++) {
             if ($r < $this->mutasi) {
-                $krom = mt_rand(0,($jam_count-1));
+                $krom = mt_rand(0,($init-1));
                 // $this->individu[$i][$krom][1] = mt_rand(0, $jam_count - 1);
                 $this->individu[$i][$krom][1] = mt_rand(0, $dospen1_count - 1);
                 $this->individu[$i][$krom][2] = mt_rand(0, $dospen2_count - 1);
@@ -293,8 +328,14 @@ class AlgorithmController extends Controller
     {
         
         $individu_solusi = array(array());
-        
-        for ($j = 0; $j < count($this->jamsidang); $j++)
+        $jam_count = count($this->jamsidang);
+        $mhs_count = count($this->mhs);
+        if($mhs_count>$jam_count){
+            $init = $jam_count;
+        }else{
+            $init = $mhs_count;
+        }
+        for ($j = 0; $j < $init; $j++)
         {
             $individu_solusi[$j][0] = intval($this->mhs[$this->individu[$indv][$j][0]]);
             $individu_solusi[$j][1] = intval($this->jamsidang[$j]);
