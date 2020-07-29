@@ -98,13 +98,7 @@
                 </div>
                 @else
                 <div class="my-3">
-                      <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="revisi" name="revisi" lang="en" accept="application/pdf">
-                          <label class="custom-file-label" for="customFileLang">Select file</label>
-                          <div class="invalid-feedback mt-0" id="invalid"></div>
-                          <div class="invalid-feedback mt-0" id="invalid2"></div>
-                          <div id="uploading"></div>
-                      </div>
+                      <input type="file" name="berkas" id="berkas">
                 </div>
                 @endif
               @else
@@ -139,11 +133,17 @@
     </div>
   </div>
   @endif
+  @endsection
+  @endif
+  
+  @if( Auth::user()->level_id =='3')
+  @section('link')
+<link rel="stylesheet" href="{{url('assets/vendor/filepond/dist/filepond.min.css')}}">
 @endsection
-@endif
-
-@if( Auth::user()->level_id =='3')
 @section('footer')
+<script src="{{url('assets/vendor/filepond/dist/filepond.min.js')}}"></script>
+<script src="{{url('assets/vendor/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js')}}"></script>
+<script src="{{url('assets/vendor/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js')}}"></script>
 <script>
   function confirmDelete(id) {
             Swal.fire({
@@ -170,58 +170,77 @@
 </script>
 <script>
     $(document).ready(function() {
-        $(document).on('change','#revisi',function() {
-            var property = document.getElementById('revisi').files[0];
-            var file_name = property.name;
-            var file_typ = file_name.split('.').pop().toLowerCase();
+        
+        FilePond.registerPlugin(
+          FilePondPluginFileValidateSize,
+          FilePondPluginFileValidateType,
+        );
 
-            if (jQuery.inArray(file_typ,['pdf'])== -1) {
-                $('#revisi').addClass('is-invalid');
-                $('#invalid').html('File type not valid')
-            }else{
-            var file_size = property.size;
-            if (file_size > 500000) {
-                $('#revisi').addClass('is-invalid');
-                $('#invalid2').html('File size is over limit')
-            }else{
-                var form = new FormData();
-                form.append('revisi', property);
-                var host = "{{url('/')}}";
-                $.ajax({
-                    url : host+'/berkas',
-                    headers:{'X-CSRF-Token':$('meta[name=csrf_token]').attr('content')},
-                    method: 'POST',
-                    data : form,
-                    contentType:false,
-                    cache: false,
-                    processData:false,
-                    beforeSend:function(){
-                        $('#uploading').html('<label class="text-warning text-sm"> Uploading file...</label>');
-                    },
-                    success:function(data) {
-                        $('#uploading').html('<label class="text-success text-sm"> File uploaded</label>');
-                        if (data.success =='done') {
-                          Swal.fire({
-                              title: 'Berhasil!',
-                              text: "Berkas lampiran revisi berhasil diupload!",
-                              icon: 'success',
-                              confirmButtonColor: '#3085d6',
-                              confirmButtonText: 'Ok!'
-                            }).then((result) => {
-                              if (result.value) {
-                                  location.reload(true);
-                              }
-                            })
+        FilePond.setOptions({
+                    acceptedFileTypes: ['application/pdf'],
+                    server: {
+                        url: '/filepond/api',
+                        process: {
+                            url: '/process',
+                            onload: function (res) {
+                                $('#berkas').data('res', res);
+                                return res;
+                            },
+                            method:'POST',
+                        },
+                        revert: '/process',
+                        headers: {
+                          'X-CSRF-Token':'{{csrf_token()}}'
                         }
-                        
-                    }
-                })
+                    },
+                    allowRevert: true,
+                });
                 
-            }
-
-            }
-            
-        })
+      const upfile = function(file) {
+        $.ajax({
+        url: "{{url('/berkas')}}",
+        data: {
+            filename: file.filename
+        },
+        headers: {'X-CSRF-Token':$('meta[name=csrf_token]').attr('content')},
+        method: 'POST',
+        dataType: 'json',
+        success: function (res) {
+          if (res.success =='done') {
+              Swal.fire({
+                  title: 'Berhasil!',
+                  text: "Berkas lampiran revisi berhasil diupload!",
+                  icon: 'success',
+                  confirmButtonColor: '#3085d6',
+                  confirmButtonText: 'Ok!'
+                }).then((result) => {
+                  if (result.value) {
+                      location.reload(true);
+                  }
+                })
+              }else{
+                Swal.fire({
+                  title: 'Gagal!',
+                  text: "Berkas lampiran revisi gagal diupload!",
+                  icon: 'error'
+                  });
+              }
+        }
+      })
+      }
+        const pond = FilePond.create(document.getElementById('berkas'));
+        pond.on('processfile', (e, file) => {
+          
+          if (file) {
+          upfile(file);
+          }else{
+            Swal.fire({
+                  title: 'Gagal!',
+                  text: "Berkas lampiran revisi gagal diupload!",
+                  icon: 'error'
+                  });
+          }
+                });
     })
 </script>
 @endsection

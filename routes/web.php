@@ -66,4 +66,8 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::prefix('filepond/api')->group(function () {
+    Route::post('/process', 'FilepondController@upload')->name('filepond.upload');
+});
+
 

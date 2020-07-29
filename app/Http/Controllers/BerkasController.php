@@ -68,9 +68,10 @@ class BerkasController extends Controller
             abort(403);
         }
         if ($request->ajax()) {
-            $data = $request->file('revisi');
-            $filename = md5(time()).'.'.$data->getClientOriginalExtension();
-            $data->move(public_path('storage'),$filename);
+            $data = $request->post('filename');
+            $data = explode(".",$data);
+            $filename = md5(Auth::user()->username).'.'.$data[1];
+            // $data->move(public_path('storage'),$filename);
             // $params =[
             //     'nim' => Auth::user()->username,
             //     'filename' => $filename,

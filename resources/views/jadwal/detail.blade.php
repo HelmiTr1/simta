@@ -80,19 +80,21 @@
               </div>
               <div class="calendar" data-toggle="calendar" id="calendar"></div>
             </div>
-            <small class="mt-4">
-                <span class="text-wrap text-sm">Jadwal sidang yang dihadiri oleh {{ucfirst($s)}}
-                  @foreach($jadwal as $data)
-                  @if($data->nim == Auth::user()->username)
-                  @php
-                    Date::setLocale('id');
-                    $date = new Date($data->tanggal);
-                  @endphp
-                   dengan nama <b class="font-weight-bold">{{$data->mhs}}</b> adalah tanggal : <b class="font-weight-bold">{{$date->format('l, j F Y')}}</b>
-                <a href="" class="btn btn-primary btn-sm" id="detail" data-toggle="modal" data-target="#myModal" data-id="{{$data->id}}"  data-nama="{{$data->mhs}}" data-tanggal="{{$date->format('l, j F Y')}}" data-waktu="{{$data->waktu}}" data-ruangan="{{$data->kode_ruangan.' - '.$data->ruangan}}" data-dosen1="{{$data->dospem1}}" data-dosen2="{{$data->dospem2}}" data-dosen3="{{$data->dospen1}}" data-dosen4="{{$data->dospen2}}"> Lihat Detail</a> </span>
-                   @endif
-                   @endforeach
-            </small>
+            <div class="mt-4">
+              <small >
+                  <span class="text-wrap text-sm">Jadwal sidang yang dihadiri oleh {{ucfirst($s)}}
+                    @foreach($jadwal as $data)
+                    @if($data->nim == Auth::user()->username)
+                    @php
+                      Date::setLocale('id');
+                      $date = new Date($data->tanggal);
+                    @endphp
+                     dengan nama <b class="font-weight-bold">{{$data->mhs}}</b> adalah tanggal : <b class="font-weight-bold">{{$date->format('l, j F Y')}}</b>
+                  <a href="" class="btn btn-primary btn-sm" id="detail" data-toggle="modal" data-target="#myModal" data-id="{{$data->id}}"  data-nama="{{$data->mhs}}" data-tanggal="{{$date->format('l, j F Y')}}" data-waktu="{{$data->waktu}}" data-ruangan="{{$data->kode_ruangan.' - '.$data->ruangan}}" data-dosen1="{{$data->dospem1}}" data-dosen2="{{$data->dospem2}}" data-dosen3="{{$data->dospen1}}" data-dosen4="{{$data->dospen2}}"> Lihat Detail</a> </span>
+                     @endif
+                     @endforeach
+              </small>
+            </div>
             @endif
             </p>
         </div>
@@ -124,6 +126,8 @@
            <div class="col-5">Ruangan</div>
            <div class="col-7">: <span id="ruangan1"></span></div>
          </div>
+         <br/>
+           <hr class="divider">
          <div class="row text-sm">
            <div class="col-5">Dosen Pembimbing 1</div>
            <div class="col-7">: <span id="dosen11"></span></div>
@@ -132,6 +136,8 @@
            <div class="col-5">Dosen Pembimbing 2</div>
            <div class="col-7">: <span id="dosen21"></span></div>
          </div>
+         <br/>
+           <hr class="divider mt-0">
          <div class="row text-sm">
            <div class="col-5">Dosen Penguji 1</div>
            <div class="col-7">: <span id="dosen31"></span></div>
@@ -171,6 +177,8 @@
              <div class="col-5">Ruangan</div>
              <div class="col-7">: <span id="ruangan"></span></div>
            </div>
+           <br/>
+           <hr class="divider">
            <div class="row text-sm">
              <div class="col-5">Dosen Pembimbing 1</div>
              <div class="col-7">: <span id="dosen1"></span></div>
@@ -179,6 +187,8 @@
              <div class="col-5">Dosen Pembimbing 2</div>
              <div class="col-7">: <span id="dosen2"></span></div>
            </div>
+           <br/>
+           <hr class="divider mt-0">
            <div class="row text-sm">
              <div class="col-5">Dosen Penguji 1</div>
              <div class="col-7">: <span id="dosen3"></span></div>
@@ -301,6 +311,10 @@
                       duration: { week: 4 }
                   }
               },
+              dayNames :['Minggu', 'Senin', 'Selasa', 'Rabu',
+              'Kamis', 'Jum`at', 'Sabtu'],
+              dayNamesShort :['Min', 'Sen', 'Sel', 'Rab',
+              'Kam', 'Jum', 'Sab'],
               timeZone:'id',
               height: 100,
             buttonIcons: {
@@ -337,7 +351,9 @@
           };
 
           // Initalize the calendar plugin
-          $this.fullCalendar(options);
+          $this.fullCalendar(options,{
+            'locale' : 'id'
+          });
 
 
           //
