@@ -105,17 +105,13 @@ class BerkasController extends Controller
               'modified_at' => now(),
               'row_status' => '-1'
               ]);
-            //   $file_path= parse_url(url('storage').'/'.$revisi->filename);
-            //   $file_path= URL::to('storage/507a9ecc17bc9c918987e3b3fd4dc280.pdf');
-            //   unlink($file_path);
-            // if(Storage::disk('public')->delete($file_path)){
-            //     return 'true';
-            // }else{
-            //     return 'false';
-            // }
-            // return $file_path;
-            Alert::success('Berhasil!','Berkas lampiran revisi dihapus')->persistent('Close');
-        return redirect('berkas')->with('status');
+              $file_path =public_path('storage').'/'.$revisi->filename;
+              
+
+              if (File::delete($file_path)) {
+                Alert::success('Berhasil!','Berkas lampiran revisi dihapus')->persistent('Close');
+                return redirect('berkas')->with('status');
+              }
     }
     
 }

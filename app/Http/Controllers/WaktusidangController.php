@@ -28,7 +28,6 @@ class WaktusidangController extends Controller
         if (Auth::user()->level_id !=1) {
             abort(403);
         }
-        $menus = Menu::all()->where('row_status','1');
         $access= DB::table('tb_menuaccess')->get()->where('id_level',Auth::user()->level_id);
         $izin = array();
         $i=0;
@@ -37,6 +36,8 @@ class WaktusidangController extends Controller
             $i++;
         }
         $menus = Menu::all()->where('row_status','1')->whereIn('id',$izin);
+
+        $waktus = Waktusidang::all()->where('row_status','1');
         return view('waktusidang.index',compact('menus','waktus'));
     }
 

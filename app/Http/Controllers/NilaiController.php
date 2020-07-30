@@ -400,7 +400,7 @@ class NilaiController extends Controller
 
         $pdf->AddPage();
         $pdf->SetAutoPageBreak(false,1);
-        $pdf->Image(url('assets/img/logo.png'),55,5);
+        $pdf->Image(url('assets/img/kop.jpg'),55,5,185,35);
         $pdf->SetFont('Times','B',14);
         $pdf->SetXY(145,40);
         $pdf->Cell(10,10,'LEMBAR REKAPITULASI NILAI TUGAS AKHIR',0,1,'C');
@@ -560,8 +560,8 @@ class NilaiController extends Controller
         $pdf->Cell(30,10,'Ketua (Pembimbing I)',0,0,'',false);
 
         $pdf->SetXY(35,190);
-        $pdf->Cell(161,10,'NIK. ',0,0,'',false);
-        $pdf->Cell(30,10,'NIK. ',0,0,'',false);
+        $pdf->Cell(161,10,'NIK. 1984080220190310',0,0,'',false);
+        $pdf->Cell(30,10,'NIK. '.$mhs->dosenp1,0,0,'',false);
         $pdf->SetFont('Times','BU',11);
         $pdf->SetXY(35,185);
         $pdf->Cell(161,10,'Agustian Noor, M.Kom',0,0,'',false);
@@ -581,13 +581,11 @@ Class myPDF extends FPDF{
         $thrird = $height+$height+$height+$height+$height+4;
         $len = strlen($t);
         if ($len > 40) {
-          $txt = str_split($t,40);
+          $txt = str_split($t,39);
           $this->SetX($x);
           $this->Cell($w, $first,$txt[0],'','','');
           $this->SetX($x);
           $this->Cell($w,$second,$txt[1],'','','');
-          $this->SetX($x);
-          $this->Cell($w,$thrird,$txt[2],'','','');
           $this->SetX($x);
           $this->Cell($w,$h,'',0,0,'L',0);
         }else{

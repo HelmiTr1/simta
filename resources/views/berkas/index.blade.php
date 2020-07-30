@@ -39,28 +39,28 @@
 @endsection
 @elseif( Auth::user()->level_id =='3')
 @if (count($jadwal)>0)
-@section('card')
-@if (count($revisi)==0)
-@php
-  foreach ($jadwal as $data ) {
-    $date = $data->tanggal;
-  }
-  Date::setLocale('id');
-  $stamp = strtotime('+7 days', strtotime($date));
-  $batas = new Date($stamp);
-  $now = date('Y-m-d');
-@endphp
-  <div class="col-xl-12">
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <span class="alert-icon"><i class="ni ni-lock-circle-open"></i></span>
-  <span class="alert-text"><strong>Perhatian!</strong> Batas akhir pengiriman berkas hasil revisi adalah : <span class="font-weight-bold">{{$batas->format('l, j F Y')}}</span> </span>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-  </div>
-@endif
-@endsection
+    @section('card')
+    @if (count($revisi)==0)
+    @php
+      foreach ($jadwal as $data ) {
+        $date = $data->tanggal;
+      }
+      Date::setLocale('id');
+      $stamp = strtotime('+7 days', strtotime($date));
+      $batas = new Date($stamp);
+      $now = date('Y-m-d');
+    @endphp
+      <div class="col-xl-12">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span class="alert-icon"><i class="ni ni-lock-circle-open"></i></span>
+      <span class="alert-text"><strong>Perhatian!</strong> Batas akhir pengiriman berkas hasil revisi adalah  <span class="font-weight-bold">{{$batas->format('l, j F Y')}}</span> </span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+      </div>
+    @endif
+    @endsection
 @section('content')
 @foreach ($content as $c)
   <div class="row">
@@ -81,13 +81,12 @@
               </div>
               <p class="mt-3 mb-0 text-sm">
               <span class="text-wrap">{{$c->isi}}</span>
-              @if (session('status'))
-              <div class="alert alert-danger">
-                  {{ session('status') }}
-              </div>
-              @endif
               @if (count($revisi)==0)
-              @if ($batas==$now)
+              @php
+                  $batas = strtotime($batas);
+                  $now = strtotime($now);
+              @endphp
+                @if ($batas < $now)
                 <div class="row mt-4">
                   <div class="col-xl-12">
                   <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -98,6 +97,7 @@
                 </div>
                 @else
                 <div class="my-3">
+                  <small>Berkas yg diupload berupa <span class="text-danger">*.pdf,</span>  dengan ukuran maksimal <span class="text-danger"> 500KB</span></small>
                       <input type="file" name="berkas" id="berkas">
                 </div>
                 @endif
@@ -106,11 +106,13 @@
               <div class="row">
   
               <div class=" col-xl-6 text-left">  <a href="{{url('berkas').'/'.$r->id}}"  target="_blank" >{{$r->filename}}</a></div>
-              <div class=" col-xl-6 text-right"> <form action="{{url('berkas').'/'.$r->id}}" method="post" class="d-inline" id="hapus-btn{{$r->id}}">
+              <div class=" col-xl-6 text-right"> 
+                <a href="{{url('berkas').'/'.$r->id}}" class="btn btn-info btn-sm" target="_blank" ><i class="fas fa-fw fa-eye"></i><span>Lihat Berkas</span> </a>
+                <form action="{{url('berkas').'/'.$r->id}}" method="post" class="d-inline" id="hapus-btn{{$r->id}}">
                     @method('delete')
                     @csrf
                   </form>
-                  <button type="submit" class="btn btn-sm btn-danger" onclick="confirmDelete({{$r->id}})">Delete</button>
+                  <button type="submit" class="btn btn-sm btn-danger" onclick="confirmDelete({{$r->id}})"><i class="fas fa-fw fa-trash"></i><span>Upload Ulang</span> </button>
                     </div>
               </div>
               @endforeach
@@ -121,8 +123,10 @@
         </a>
       </div>
   </div>
-        @endforeach
-    @else
+  @endforeach
+  @endsection
+@else
+ @section('content')
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -132,11 +136,11 @@
       </div>
     </div>
   </div>
-  @endif
-  @endsection
-  @endif
+@endsection
+@endif
+@endif
   
-  @if( Auth::user()->level_id =='3')
+@if( Auth::user()->level_id =='3')
   @section('link')
 <link rel="stylesheet" href="{{url('assets/vendor/filepond/dist/filepond.min.css')}}">
 @endsection
@@ -178,8 +182,9 @@
 
         FilePond.setOptions({
                     acceptedFileTypes: ['application/pdf'],
+                    maxFileSize :'500KB',
                     server: {
-                        url: '/filepond/api',
+                        url: '{{url("/")}}/filepond/api',
                         process: {
                             url: '/process',
                             onload: function (res) {

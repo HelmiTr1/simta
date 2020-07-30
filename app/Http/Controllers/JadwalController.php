@@ -115,7 +115,7 @@ class JadwalController extends Controller
 
         $jad_cek = count($jadwal_cek);
         $mh_cek = count($mhs_cek);
-
+        // return $mh_cek;die;
         if ($jad_cek != $mh_cek ) {
             $algorithm = new AlgorithmController($batch,$populasi,$crossover,$mutasi);
     
